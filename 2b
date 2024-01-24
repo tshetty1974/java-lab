@@ -1,0 +1,72 @@
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashSet" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Set" %>
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Number Analysis</title>
+</head>
+<body>
+
+    <h2>Number Analysis</h2>
+
+    <form action="" method="post">
+        Enter eleven numbers (separated by commas):
+        <input type="text" name="numbers" required>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <%
+        String numbersInput = request.getParameter("numbers");
+
+        if (numbersInput != null && !numbersInput.isEmpty()) {
+            // Split the input into an array of strings
+            String[] numbersArray = numbersInput.split(",");
+
+            // Convert the array of strings to a list of integers
+            List<Integer> numbersList = new ArrayList<>();
+            for (String num : numbersArray) {
+                numbersList.add(Integer.parseInt(num.trim()));
+            }
+
+            // Calculate average
+            int sum = 0;
+            for (int num : numbersList) {
+                sum += num;
+            }
+            double average = (double) sum / numbersList.size();
+
+            // Identify numbers below average
+            List<Integer> belowAverageNumbers = new ArrayList<>();
+            for (int num : numbersList) {
+                if (num < average) {
+                    belowAverageNumbers.add(num);
+                }
+            }
+
+            // Find duplicate numbers using a set
+            Set<Integer> uniqueNumbers = new HashSet<>();
+            Set<Integer> duplicateNumbers = new HashSet<>();
+            for (int num : numbersList) {
+                if (!uniqueNumbers.add(num)) {
+                    duplicateNumbers.add(num);
+                }
+            }
+
+            // Display results
+    %>
+
+            <h3>Results:</h3>
+            <p>Average: <%= average %></p>
+            <p>Numbers below average: <%= belowAverageNumbers %></p>
+            <p>Duplicate numbers: <%= duplicateNumbers %></p>
+
+    <%
+        }
+    %>
+
+</body>
+</html>
