@@ -1,0 +1,58 @@
+import java.sql.*;
+
+public class MoviesDatabaseOperations {
+    // JDBC URL, username, and password of MySQL server
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/your_database_name";
+    private static final String USERNAME = "your_username";
+    private static final String PASSWORD = "your_password";
+
+    public static void main(String[] args) {
+        try {
+            // Connect to the database
+            Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+
+            // Display details of all movies
+            String queryAllMovies = "SELECT * FROM Movies";
+            try (Statement statement = connection.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
+                 ResultSet resultSetAllMovies = statement.executeQuery(queryAllMovies)) {
+
+                System.out.println("Details of all Movies:");
+                while (resultSetAllMovies.next()) {
+                    System.out.println("ID: " + resultSetAllMovies.getInt("ID") +
+                            ", Movie_Name: " + resultSetAllMovies.getString("Movie_Name") +
+                            ", Genre: " + resultSetAllMovies.getString("Genre") +
+                            ", IMDB_Rating: " + resultSetAllMovies.getDouble("IMDB_Rating") +
+                            ", Year: " + resultSetAllMovies.getInt("Year"));
+                }
+                System.out.println();
+            }
+
+            // Display details of the 5th movie
+            String queryMovieById = "SELECT * FROM Movies WHERE ID = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(queryMovieById,
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE)) {
+
+                preparedStatement.setInt(1, 5);
+                try (ResultSet resultSetMovieById = preparedStatement.executeQuery()) {
+                    System.out.println("Details of the 5th Movie:");
+                    if (resultSetMovieById.next()) {
+                        System.out.println("ID: " + resultSetMovieById.getInt("ID") +
+                                ", Movie_Name: " + resultSetMovieById.getString("Movie_Name") +
+                                ", Genre: " + resultSetMovieById.getString("Genre") +
+                                ", IMDB_Rating: " + resultSetMovieById.getDouble("IMDB_Rating") +
+                                ", Year: " + resultSetMovieById.getInt("Year"));
+                    } else {
+                        System.out.println("Movie with ID 5 not found.");
+                    }
+                    System.out.println();
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
