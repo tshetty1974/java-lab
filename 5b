@@ -1,0 +1,118 @@
+//html file
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voter Eligibility Check</title>
+</head>
+<body>
+
+    <h2>Voter Eligibility Check</h2>
+
+    <form action="server5" method="post">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" required><br>
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="dob">Date of Birth (DD-MM-YYYY):</label>
+        <input type="text" id="dob" name="dob" required>
+        <br>
+
+        <input type="submit" value="Check Eligibility">
+    </form>
+
+</body>
+</html>
+
+
+//java lab
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Date;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/server5")
+public class server5 extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Read user input from the form
+        String firstName = request.getParameter("firstName");
+        String lastName = request.getParameter("lastName");
+        String email = request.getParameter("email");
+        String dobString = request.getParameter("dob");
+
+        // Validate the input
+        if (firstName == null || lastName == null || email == null || dobString == null ||
+                firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || dobString.isEmpty()) {
+            displayError(response, "All fields are required. Please fill out the form.");
+            return;
+        }
+
+        String dob = dobString.substring(dobString.length() - 4);
+        int dobb=Integer.parseInt(dob);
+        
+        try {
+            // Parse the date of birth directly without SimpleDateFormat
+            
+
+            // Check voter eligibility based on age (considering 18 years as the voting age)
+            if (isEligibleToVote(dobb)){
+                displayResult(response, firstName, lastName, email, dobString);
+            } else {
+                displayError(response, "You are not eligible to vote yet. Minimum age required: 18 years.");
+            }
+        } catch (Exception e) {
+            displayError(response, "Invalid date of birth. Please enter a valid date in the format YYYY-MM-DD.");
+        }
+    }
+
+    private void displayResult(HttpServletResponse response, String firstName, String lastName, String email, String dob)
+            throws IOException {
+        // Set the response content type
+        response.setContentType("text/html");
+
+        // Get the PrintWriter
+        PrintWriter out = response.getWriter();
+
+        // Display voter eligibility result
+        out.println("<html><body>");
+        out.println("<h2>Voter Eligibility Result for " + firstName + " " + lastName + "</h2>");
+        out.println("<p>Email: " + email + "</p>");
+        out.println("<p>Date of Birth: " + dob + "</p>");
+        out.println("<p><strong>Congratulations, you are eligible to vote!</strong></p>");
+        out.println("</body></html>");
+    }
+
+    private void displayError(HttpServletResponse response, String errorMessage) throws IOException {
+        // Set the response content type
+        response.setContentType("text/html");
+
+        // Get the PrintWriter
+        PrintWriter out = response.getWriter();
+
+        // Display error message
+        out.println("<html><body>");
+        out.println("<h2>Error</h2>");
+        out.println("<p>" + errorMessage + "</p>");
+        out.println("</body></html>");
+    }
+
+    private boolean isEligibleToVote(int dob) {
+        // Check voter eligibility based on age (considering 18 years as the voting age)
+        int ageInYears;
+        ageInYears = 2024 - dob;
+
+        return ageInYears >= 18;
+    }
+}
