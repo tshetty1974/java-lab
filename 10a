@@ -1,0 +1,52 @@
+import java.sql.*;
+
+public class StudentAdmissionJDBC {
+
+    public static void main(String[] args) {
+        try {
+            // Load the JDBC driver and establish a connection
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/Registration", "your_username", "your_password");
+
+            // Create the student_admission table if not exists
+            try (Statement createStatement = connection.createStatement()) {
+                String createTableSQL = "CREATE TABLE IF NOT EXISTS student_admission (" +
+                        "Student_Name VARCHAR(50) NOT NULL," +
+                        "USN VARCHAR(20) PRIMARY KEY," +
+                        "Branch VARCHAR(20) NOT NULL," +
+                        "Admission_Source VARCHAR(20) NOT NULL)";
+                createStatement.executeUpdate(createTableSQL);
+            }
+
+            // Insert rows into the student_admission table
+            try (Statement insertStatement = connection.createStatement()) {
+                // Insert sample data
+                insertStatement.executeUpdate("INSERT INTO student_admission VALUES ('John Doe', '1BM18CS001', 'CSE', 'CET')");
+                insertStatement.executeUpdate("INSERT INTO student_admission VALUES ('Jane Smith', '1BM18EC002', 'ECE', 'COMED_K')");
+                insertStatement.executeUpdate("INSERT INTO student_admission VALUES ('Bob Johnson', '1BM18ME003', 'ME', 'CET')");
+            }
+
+            // Extract students who are admitted through CET and branch is CSE
+            try (Statement queryStatement = connection.createStatement();
+                 ResultSet resultSet = queryStatement.executeQuery("SELECT * FROM student_admission WHERE Admission_Source = 'CET' AND Branch = 'CSE'")) {
+
+                // Display the result set
+                System.out.println("Students Admitted through CET and Branch is CSE:");
+                System.out.printf("%-20s %-15s %-20s %-20s%n", "Student Name", "USN", "Branch", "Admission Source");
+                while (resultSet.next()) {
+                    System.out.printf("%-20s %-15s %-20s %-20s%n",
+                            resultSet.getString("Student_Name"),
+                            resultSet.getString("USN"),
+                            resultSet.getString("Branch"),
+                            resultSet.getString("Admission_Source"));
+                }
+            }
+
+            // Close the connection
+            connection.close();
+
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
