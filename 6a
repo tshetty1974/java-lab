@@ -1,0 +1,79 @@
+import java.sql.*;
+
+public class EmployeeDatabaseOperations {
+    // JDBC URL, username, and password of MySQL server
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/your_database_name";
+    private static final String USERNAME = "your_username";
+    private static final String PASSWORD = "your_password";
+
+    public static void main(String[] args) {
+        try {
+            // Connect to the database
+            Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+
+            // Create a table to store employee details
+            String createTableQuery = "CREATE TABLE IF NOT EXISTS Employee (" +
+                    "emp_id INT PRIMARY KEY," +
+                    "emp_name VARCHAR(50)," +
+                    "designation VARCHAR(20)," +
+                    "salary DOUBLE)";
+
+            try (Statement createTableStatement = connection.createStatement()) {
+                createTableStatement.execute(createTableQuery);
+            }
+
+            // Insert employee details
+            String insertDataQuery = "INSERT INTO Employee VALUES (?, ?, ?, ?)";
+            try (PreparedStatement insertDataStatement = connection.prepareStatement(insertDataQuery)) {
+                insertDataStatement.setInt(1, 1);
+                insertDataStatement.setString(2, "John Doe");
+                insertDataStatement.setString(3, "Asst. Prof");
+                insertDataStatement.setDouble(4, 50000.0);
+                insertDataStatement.executeUpdate();
+
+                // Insert more employee data as needed
+            }
+
+            // Display employee details before update
+            String displayDataBeforeUpdateQuery = "SELECT * FROM Employee";
+            try (Statement displayDataBeforeUpdateStatement = connection.createStatement();
+                 ResultSet resultSetBeforeUpdate = displayDataBeforeUpdateStatement.executeQuery(displayDataBeforeUpdateQuery)) {
+
+                System.out.println("Employee Details Before Update:");
+                while (resultSetBeforeUpdate.next()) {
+                    System.out.println("Emp ID: " + resultSetBeforeUpdate.getInt("emp_id") +
+                            ", Emp Name: " + resultSetBeforeUpdate.getString("emp_name") +
+                            ", Designation: " + resultSetBeforeUpdate.getString("designation") +
+                            ", Salary: " + resultSetBeforeUpdate.getDouble("salary"));
+                }
+                System.out.println();
+            }
+
+            // Update the designation of an employee
+            String updateDesignationQuery = "UPDATE Employee SET designation = ? WHERE emp_id = ?";
+            try (PreparedStatement updateDesignationStatement = connection.prepareStatement(updateDesignationQuery)) {
+                updateDesignationStatement.setString(1, "Assoc. Prof");
+                updateDesignationStatement.setInt(2, 1);
+                updateDesignationStatement.executeUpdate();
+            }
+
+            // Display employee details after update
+            String displayDataAfterUpdateQuery = "SELECT * FROM Employee";
+            try (Statement displayDataAfterUpdateStatement = connection.createStatement();
+                 ResultSet resultSetAfterUpdate = displayDataAfterUpdateStatement.executeQuery(displayDataAfterUpdateQuery)) {
+
+                System.out.println("Employee Details After Update:");
+                while (resultSetAfterUpdate.next()) {
+                    System.out.println("Emp ID: " + resultSetAfterUpdate.getInt("emp_id") +
+                            ", Emp Name: " + resultSetAfterUpdate.getString("emp_name") +
+                            ", Designation: " + resultSetAfterUpdate.getString("designation") +
+                            ", Salary: " + resultSetAfterUpdate.getDouble("salary"));
+                }
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
