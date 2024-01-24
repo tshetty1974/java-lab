@@ -1,0 +1,60 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Movie Ticket Price Calculator</title>
+</head>
+<body>
+
+    <h2>Movie Ticket Price Calculator</h2>
+
+    <form action="" method="post">
+        Enter your name:
+        <input type="text" name="name" required>
+        <br>
+        Enter your age:
+        <input type="text" name="age" required>
+        <br>
+        <input type="submit" value="Calculate Ticket Price">
+    </form>
+
+    <%
+        // Read name and age from the form
+        String name = request.getParameter("name");
+        String ageParam = request.getParameter("age");
+
+        // Check if age parameter is not null or empty
+        if (ageParam != null && !ageParam.trim().isEmpty()) {
+            // Parse age as an integer
+            int age = Integer.parseInt(ageParam);
+
+            // Calculate ticket price based on age
+            int ticketPrice;
+
+            if (age > 62) {
+                ticketPrice = 50;
+            } else if (age < 10) {
+                ticketPrice = 30;
+            } else {
+                ticketPrice = 80;
+            }
+    %>
+
+    <h3>Result:</h3>
+    <p>Hello <%= name %>,</p>
+    <p>Your age: <%= age %></p>
+    <p>Movie Ticket Price: Rs. <%= ticketPrice %></p>
+
+    <%
+        } else {
+            // Handle the case where age is missing
+    %>
+
+    <h3>Error:</h3>
+    <p>Please enter a valid age.</p>
+
+    <%
+        }
+    %>
+
+</body>
+</html>
