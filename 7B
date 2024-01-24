@@ -1,0 +1,51 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.sql.*" %>
+
+<%
+    // JDBC Connection parameters
+    String jdbcUrl = "jdbc:mysql://localhost:3306/employee";
+    String jdbcUsername = "root";
+    String jdbcPassword = "";
+
+    try {
+        // Load the JDBC driver
+        Class.forName("com.mysql.jdbc.Driver");
+
+        // Establish the connection
+        Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
+
+        // Create a statement
+        Statement statement = connection.createStatement();
+
+        // Execute a query to get employee details
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM emp");
+
+        // Display employee details and update salary
+        while (resultSet.next()) {
+            String empId = resultSet.getString("ID");
+            String empName = resultSet.getString("Fname");
+            double salary = resultSet.getDouble("Salary");
+
+            // Raise salary by 10% if it is less than 20,000
+            if (salary < 20000) {
+                double updatedSalary = salary * 1.1;
+                out.println("Employee ID: " + empId + "<br>");
+                out.println("Employee Name: " + empName + "<br>");
+                out.println("Original Salary: " + salary + "<br>");
+                out.println("Updated Salary: " + updatedSalary + "<br><br>");
+            } else {
+                out.println("Employee ID: " + empId + "<br>");
+                out.println("Employee Name: " + empName + "<br>");
+                out.println("Salary: " + salary + "<br><br>");
+            }
+        }
+
+        // Close the resources
+        resultSet.close();
+        statement.close();
+        connection.close();
+
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    }
+%>
