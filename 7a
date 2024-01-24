@@ -1,0 +1,49 @@
+import java.sql.*;
+
+public class job {
+
+    public static void main(String[] args) {
+        try {
+            // Load the JDBC driver and establish a connection
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/employee", "root", "");
+
+            // Create the Employee table if not exists
+            try (Statement createStatement = connection.createStatement()) {
+                String createTableSQL = "CREATE TABLE IF NOT EXISTS e (" +
+                        "Employee_ID INT PRIMARY KEY," +
+                        "Employee_Name VARCHAR(50) NOT NULL," +
+                        "Salary DOUBLE NOT NULL)";
+                createStatement.executeUpdate(createTableSQL);
+            }
+
+            // Insert rows into the Employee table
+            try (Statement insertStatement = connection.createStatement()) {
+                insertStatement.executeUpdate("INSERT INTO e VALUES (1, 'John Doe', 60000)");
+                insertStatement.executeUpdate("INSERT INTO e VALUES (2, 'Jane Smith', 75000)");
+                insertStatement.executeUpdate("INSERT INTO e VALUES (3, 'Bob Johnson', 45000)");
+            }
+
+            // Display details of employees with salary above Rs. 50,000
+            try (Statement displayStatement = connection.createStatement();
+                 ResultSet resultSet = displayStatement.executeQuery("SELECT * FROM e WHERE Salary > 50000")) {
+
+                // Display the result set
+                System.out.println("Employee Details with Salary above Rs. 50,000:");
+                System.out.printf("%-15s %-20s %-10s%n", "Employee ID", "Employee Name", "Salary");
+                while (resultSet.next()) {
+                    System.out.printf("%-15s %-20s %-10.2f%n",
+                            resultSet.getInt("Employee_ID"),
+                            resultSet.getString("Employee_Name"),
+                            resultSet.getDouble("Salary"));
+                }
+            }
+
+            // Close the connection
+            connection.close();
+
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
