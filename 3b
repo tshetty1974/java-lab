@@ -1,0 +1,77 @@
+//html file
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vote Eligibility Check</title>
+</head>
+<body>
+
+    <h2>Vote Eligibility Check</h2>
+
+    <form action="/your-web-context/VoteEligibilityServlet" method="post">
+        <label for="userName">User Name:</label>
+        <input type="text" id="userName" name="userName" required><br>
+
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <!-- Add more gender options as needed -->
+        </select><br>
+
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br>
+
+        <input type="submit" value="Check Eligibility">
+    </form>
+
+</body>
+</html>
+
+
+
+//java file
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/VoteEligibilityServlet")
+public class VoteEligibilityServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Read user input from the form
+        String userName = request.getParameter("userName");
+        String gender = request.getParameter("gender");
+        int age = Integer.parseInt(request.getParameter("age"));
+
+        // Determine eligibility based on age
+        boolean isEligibleToVote = age >= 18;
+
+        // Set the response content type
+        response.setContentType("text/html");
+
+        // Get the PrintWriter
+        PrintWriter out = response.getWriter();
+
+        // Display vote eligibility result
+        out.println("<html><body>");
+        out.println("<h2>Vote Eligibility Result for " + userName + "</h2>");
+        out.println("<p>Gender: " + gender + "</p>");
+        out.println("<p>Age: " + age + "</p>");
+
+        if (isEligibleToVote) {
+            out.println("<p><strong>Congratulations, you are eligible to vote!</strong></p>");
+        } else {
+            out.println("<p>Sorry, you are not eligible to vote yet.</p>");
+        }
+
+        out.println("</body></html>");
+    }
+}
