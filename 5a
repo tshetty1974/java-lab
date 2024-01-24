@@ -1,0 +1,54 @@
+import java.sql.*;
+
+public class BankAccountJDBC {
+
+    public static void main(String[] args) {
+        try {
+            // Load the JDBC driver and establish a connection
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database", "your_username", "your_password")) {
+
+                // Create the Bank_Account table if not exists
+                try (Statement statement = connection.createStatement()) {
+                    String createTableSQL = "CREATE TABLE IF NOT EXISTS Bank_Account (" +
+                            "Account_No VARCHAR(20) PRIMARY KEY," +
+                            "Account_Name VARCHAR(50) NOT NULL," +
+                            "Type_of_Account VARCHAR(20) NOT NULL," +
+                            "Balance DOUBLE NOT NULL)";
+                    statement.executeUpdate(createTableSQL);
+                }
+
+                // Insert rows into the Bank_Account table
+                try (Statement statement = connection.createStatement()) {
+                    String accountNo = "A" + System.currentTimeMillis();
+                    String accountName = "John Doe";
+                    String typeOfAccount = "Savings";
+                    double balance = 1000.0;
+
+                    String insertSQL = String.format("INSERT INTO Bank_Account (Account_No, Account_Name, Type_of_Account, Balance) VALUES ('%s', '%s', '%s', %f)",
+                            accountNo, accountName, typeOfAccount, balance);
+
+                    int rowsAffected = statement.executeUpdate(insertSQL);
+                    System.out.println(rowsAffected + " row(s) inserted.");
+                }
+
+                // Display details of all accounts
+                try (Statement statement = connection.createStatement();
+                     ResultSet resultSet = statement.executeQuery("SELECT * FROM Bank_Account")) {
+
+                    System.out.println("Account Details:");
+                    System.out.printf("%-15s %-20s %-15s %-10s%n", "Account No", "Account Name", "Type of Account", "Balance");
+                    while (resultSet.next()) {
+                        System.out.printf("%-15s %-20s %-15s %-10.2f%n",
+                                resultSet.getString("Account_No"),
+                                resultSet.getString("Account_Name"),
+                                resultSet.getString("Type_of_Account"),
+                                resultSet.getDouble("Balance"));
+                    }
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
