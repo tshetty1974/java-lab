@@ -1,0 +1,89 @@
+//html file
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CGPA Calculator</title>
+</head>
+<body>
+
+    <h2>CGPA Calculator</h2>
+
+    <form action="/your-web-context/CgpaCalculatorServlet" method="post">
+        <label for="usn">USN:</label>
+        <input type="text" id="usn" name="usn" required><br>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="sgpa1">SGPA Semester 1:</label>
+        <input type="number" step="0.01" id="sgpa1" name="sgpa1" required><br>
+
+        <label for="sgpa2">SGPA Semester 2:</label>
+        <input type="number" step="0.01" id="sgpa2" name="sgpa2" required><br>
+
+        <label for="sgpa3">SGPA Semester 3:</label>
+        <input type="number" step="0.01" id="sgpa3" name="sgpa3" required><br>
+
+        <label for="sgpa4">SGPA Semester 4:</label>
+        <input type="number" step="0.01" id="sgpa4" name="sgpa4" required><br>
+
+        <input type="submit" value="Calculate CGPA">
+    </form>
+
+</body>
+</html>
+
+
+//java file
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/CgpaCalculatorServlet")
+public class CgpaCalculatorServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Read user input from the form
+        String usn = request.getParameter("usn");
+        String name = request.getParameter("name");
+
+        // Read SGPA of previous 4 semesters
+        double sgpa1 = Double.parseDouble(request.getParameter("sgpa1"));
+        double sgpa2 = Double.parseDouble(request.getParameter("sgpa2"));
+        double sgpa3 = Double.parseDouble(request.getParameter("sgpa3"));
+        double sgpa4 = Double.parseDouble(request.getParameter("sgpa4"));
+
+        // Calculate CGPA
+        double cgpa = calculateCgpa(sgpa1, sgpa2, sgpa3, sgpa4);
+
+        // Set the response content type
+        response.setContentType("text/html");
+
+        // Get the PrintWriter
+        PrintWriter out = response.getWriter();
+
+        // Display CGPA result
+        out.println("<html><body>");
+        out.println("<h2>CGPA Calculation Result</h2>");
+        out.println("<p>USN: " + usn + "</p>");
+        out.println("<p>Name: " + name + "</p>");
+        out.println("<p>SGPA Semester 1: " + sgpa1 + "</p>");
+        out.println("<p>SGPA Semester 2: " + sgpa2 + "</p>");
+        out.println("<p>SGPA Semester 3: " + sgpa3 + "</p>");
+        out.println("<p>SGPA Semester 4: " + sgpa4 + "</p>");
+        out.println("<p><strong>Calculated CGPA: " + cgpa + "</strong></p>");
+        out.println("</body></html>");
+    }
+
+    private double calculateCgpa(double sgpa1, double sgpa2, double sgpa3, double sgpa4) {
+        // Assuming equal weightage for all semesters
+        return (sgpa1 + sgpa2 + sgpa3 + sgpa4) / 4.0;
+    }
+}
