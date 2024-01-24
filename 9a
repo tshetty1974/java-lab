@@ -1,0 +1,64 @@
+import java.sql.*;
+
+public class job {
+
+    public static void main(String[] args) {
+        try {
+            // Load the JDBC driver and establish a connection
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/employee", "root", "");
+
+            // Create the student table if not exists
+            try (Statement createStatement = connection.createStatement()) {
+                String createTableSQL = "CREATE TABLE IF NOT EXISTS student (" +
+                        "Roll_No INT PRIMARY KEY," +
+                        "Name VARCHAR(50) NOT NULL," +
+                        "Program VARCHAR(20) NOT NULL," +
+                        "Year_of_Admission INT NOT NULL)";
+                createStatement.executeUpdate(createTableSQL);
+            }
+
+            // Insert rows into the student table
+            try (Statement insertStatement = connection.createStatement()) {
+                // Insert sample data
+                insertStatement.executeUpdate("INSERT INTO student VALUES (1, 'John Doe', 'BE', 2023)");
+                insertStatement.executeUpdate("INSERT INTO student VALUES (2, 'Jane Smith', 'BSc', 2022)");
+                insertStatement.executeUpdate("INSERT INTO student VALUES (3, 'Bob Johnson', 'BE', 2023)");
+            }
+
+            // (i) List the name and roll number of all the students who are enrolled in year 2023
+            try (Statement queryStatement = connection.createStatement();
+                 ResultSet resultSet1 = queryStatement.executeQuery("SELECT Roll_No, Name FROM student WHERE Year_of_Admission = 2023")) {
+
+                // Display the result set
+                System.out.println("Students Enrolled in Year 2023:");
+                System.out.printf("%-15s %-20s%n", "Roll No", "Name");
+                while (resultSet1.next()) {
+                    System.out.printf("%-15s %-20s%n",
+                            resultSet1.getInt("Roll_No"),
+                            resultSet1.getString("Name"));
+                }
+            }
+
+            // (ii) List the Roll-No and Name of all the students of BE Program
+            try (Statement queryStatement = connection.createStatement();
+                 ResultSet resultSet2 = queryStatement.executeQuery("SELECT Roll_No, Name FROM student WHERE Program = 'BE'")) {
+
+                // Display the result set
+                System.out.println("\nStudents of BE Program:");
+                System.out.printf("%-15s %-20s%n", "Roll No", "Name");
+                while (resultSet2.next()) {
+                    System.out.printf("%-15s %-20s%n",
+                            resultSet2.getInt("Roll_No"),
+                            resultSet2.getString("Name"));
+                }
+            }
+
+            // Close the connection
+            connection.close();
+
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
