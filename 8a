@@ -1,0 +1,72 @@
+import java.sql.*;
+
+public class StudentDatabaseOperations {
+    // JDBC URL, username, and password of MySQL server
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/your_database_name";
+    private static final String USERNAME = "your_username";
+    private static final String PASSWORD = "your_password";
+
+    public static void main(String[] args) {
+        try {
+            // Connect to the database
+            Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+
+            // Create a table to store student details
+            String createTableQuery = "CREATE TABLE IF NOT EXISTS Students (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY," +
+                    "name VARCHAR(50)," +
+                    "grade CHAR(1))";
+
+            try (Statement createTableStatement = connection.createStatement()) {
+                createTableStatement.execute(createTableQuery);
+            }
+
+            // Insert student information
+            String insertDataQuery = "INSERT INTO Students (name, grade) VALUES (?, ?)";
+            try (PreparedStatement insertDataStatement = connection.prepareStatement(insertDataQuery)) {
+                insertDataStatement.setString(1, "John");
+                insertDataStatement.setString(2, "A");
+                insertDataStatement.executeUpdate();
+
+                insertDataStatement.setString(1, "Ram");
+                insertDataStatement.setString(2, "A");
+                insertDataStatement.executeUpdate();
+
+                // Insert more student data as needed
+            }
+
+            // Display all student information
+            String displayDataQuery = "SELECT * FROM Students";
+            try (ResultSet resultSet = connection.createStatement().executeQuery(displayDataQuery)) {
+                System.out.println("Student Details:");
+                while (resultSet.next()) {
+                    System.out.println("ID: " + resultSet.getInt("id") +
+                            ", Name: " + resultSet.getString("name") +
+                            ", Grade: " + resultSet.getString("grade"));
+                }
+                System.out.println();
+            }
+
+            // Update grade for student named "Ram"
+            String updateGradeQuery = "UPDATE Students SET grade = ? WHERE name = ?";
+            try (PreparedStatement updateGradeStatement = connection.prepareStatement(updateGradeQuery)) {
+                updateGradeStatement.setString(1, "S");
+                updateGradeStatement.setString(2, "Ram");
+                updateGradeStatement.executeUpdate();
+            }
+
+            // Display updated student information
+            try (ResultSet resultSetAfterUpdate = connection.createStatement().executeQuery(displayDataQuery)) {
+                System.out.println("Student Details After Update:");
+                while (resultSetAfterUpdate.next()) {
+                    System.out.println("ID: " + resultSetAfterUpdate.getInt("id") +
+                            ", Name: " + resultSetAfterUpdate.getString("name") +
+                            ", Grade: " + resultSetAfterUpdate.getString("grade"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
