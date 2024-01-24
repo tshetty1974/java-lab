@@ -1,0 +1,92 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Grade Calculator</title>
+</head>
+<body>
+
+    <h2>Grade Calculator</h2>
+
+    <form action="" method="post">
+        Enter Percentage of java:
+        <input type="text" name="j" required>
+        <br>
+        Enter Percentage of sub1:
+        <input type="text" name="s1" required>
+        <br>
+        Enter Percentage of s2:
+        <input type="text" name="s2" required>
+        <br>
+        Enter Percentage of s3:
+        <input type="text" name="s3" required>
+        <br>
+        <input type="submit" value="Calculate Grade">
+    </form>
+
+    <%
+        try {
+            // Read percentage from the form
+            String p = request.getParameter("j");
+            String p1 = request.getParameter("s1");
+            String p2 = request.getParameter("s2");
+            String p3 = request.getParameter("s3");
+
+            // Check if parameters are not null or empty
+            if (p != null && !p.trim().isEmpty() &&
+                p1 != null && !p1.trim().isEmpty() &&
+                p2 != null && !p2.trim().isEmpty() &&
+                p3 != null && !p3.trim().isEmpty()) {
+
+                // Parse the percentage as a double
+                double f = Double.parseDouble(p);
+                double f1 = Double.parseDouble(p1);
+                double f2 = Double.parseDouble(p2);
+                double f3 = Double.parseDouble(p3);
+
+                double total = f + f1 + f2 + f3;
+                double avg = total / 4.0;
+
+                // Calculate grade based on percentage
+                char grade;
+
+                if (avg >= 90) {
+                    grade = 'A';
+                } else if (avg >= 80) {
+                    grade = 'B';
+                } else if (avg >= 70) {
+                    grade = 'C';
+                } else if (avg >= 60) {
+                    grade = 'D';
+                } else {
+                    grade = 'F';
+                %>
+
+                <h3>Result:</h3>
+                <p>Average: <%= avg %></p>
+                <p>Grade: <%= grade %></p>
+
+                <%
+            } }
+                else {
+                // Handle the case where any input is missing
+                %>
+                <h3>Error:</h3>
+                <p>Please enter valid percentages for all subjects.</p>
+                <%
+            }
+
+        } catch (NumberFormatException e) {
+            // Handle the NumberFormatException
+            %>
+            <h3>Error:</h3>
+            <p>Please enter valid numeric percentages for all subjects.</p>
+            <%
+        }
+
+    %>
+
+</body>
+</html>
+
+
+// Note write marks instead of percentage
