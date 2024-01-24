@@ -1,0 +1,76 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class CountryDatabaseOperations {
+    // JDBC URL, username, and password of MySQL server
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/your_database_name";
+    private static final String USERNAME = "your_username";
+    private static final String PASSWORD = "your_password";
+
+    public static void main(String[] args) {
+        try {
+            // Connect to the database
+            Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+
+            // Create a table to store country details
+            String createTableQuery = "CREATE TABLE IF NOT EXISTS Country (" +
+                    "country_code VARCHAR(3) PRIMARY KEY," +
+                    "capital VARCHAR(50)," +
+                    "continent VARCHAR(50)," +
+                    "population INT)";
+
+            try (Statement createTableStatement = connection.createStatement()) {
+                createTableStatement.execute(createTableQuery);
+            }
+
+            // Insert country details from user input
+            Scanner scanner = new Scanner(System.in);
+            for (int i = 0; i < 5; i++) {
+                System.out.println("Enter details for Country " + (i + 1) + ":");
+                System.out.print("Country Code: ");
+                String countryCode = scanner.nextLine().toUpperCase();
+
+                System.out.print("Capital: ");
+                String capital = scanner.nextLine();
+
+                System.out.print("Continent: ");
+                String continent = scanner.nextLine();
+
+                System.out.print("Population: ");
+                int population = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character
+
+                String insertDataQuery = "INSERT INTO Country VALUES (?, ?, ?, ?)";
+                try (PreparedStatement insertDataStatement = connection.prepareStatement(insertDataQuery)) {
+                    insertDataStatement.setString(1, countryCode);
+                    insertDataStatement.setString(2, capital);
+                    insertDataStatement.setString(3, continent);
+                    insertDataStatement.setInt(4, population);
+                    insertDataStatement.executeUpdate();
+                }
+            }
+
+            // Display at least 5 country details in ascending order of their population
+            String displayDataQuery = "SELECT * FROM Country ORDER BY population ASC LIMIT 5";
+            try (Statement displayDataStatement = connection.createStatement();
+                 ResultSet resultSet = displayDataStatement.executeQuery(displayDataQuery)) {
+
+                System.out.println("Country Details:");
+                System.out.printf("%-15s %-20s %-20s %-15s%n", "Country Code", "Capital", "Continent", "Population");
+                while (resultSet.next()) {
+                    System.out.printf("%-15s %-20s %-20s %-15d%n",
+                            resultSet.getString("country_code"),
+                            resultSet.getString("capital"),
+                            resultSet.getString("continent"),
+                            resultSet.getInt("population"));
+                }
+            }
+
+            // Close the scanner
+            scanner.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
