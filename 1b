@@ -1,0 +1,67 @@
+//html file
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Payroll Form</title>
+</head>
+<body>
+    <h2>Employee Payroll Form</h2>
+    <form action="s1" method="post">
+        <label for="employeeName">Employee's Name:</label>
+        <input type="text" id="employeeName" name="employeeName" required><br>
+
+        <label for="hoursWorked">Hours Worked in a Week:</label>
+        <input type="number" id="hoursWorked" name="hoursWorked" required><br>
+
+        <label for="hourlyPayRate">Hourly Pay Rate:</label>
+        <input type="number" id="hourlyPayRate" name="hourlyPayRate" required><br>
+
+        <input type="submit" value="Generate Payroll Statement">
+    </form>
+</body>
+</html>
+
+//java file
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/s1")
+public class s1 extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Read employee information from the form
+        String employeeName = request.getParameter("employeeName");
+        double hoursWorked = Double.parseDouble(request.getParameter("hoursWorked"));
+        double hourlyPayRate = Double.parseDouble(request.getParameter("hourlyPayRate"));
+        double taxRate = 0.20;
+
+        // Calculate gross pay, tax amount, and net pay
+        double grossPay = hoursWorked * hourlyPayRate;
+        double taxAmount = grossPay * taxRate;
+        double netPay = grossPay - taxAmount;
+
+        // Set the response content type
+        response.setContentType("text/html");
+
+        // Get the PrintWriter
+        PrintWriter out = response.getWriter();
+
+        // Print the payroll statement
+        out.println("<html><body>");
+        out.println("<h2>Payroll Statement for Employee: " + employeeName + "</h2>");
+        out.println("<p>Hours Worked: " + hoursWorked + "</p>");
+        out.println("<p>Hourly Pay Rate: $" + hourlyPayRate + "</p>");
+        out.println("<p>Gross Pay: $" + grossPay + "</p>");
+        out.println("<p>Tax Amount (20%): $" + taxAmount + "</p>");
+        out.println("<p>Net Pay: $" + netPay + "</p>");
+        out.println("</body></html>");
+    }
+}
